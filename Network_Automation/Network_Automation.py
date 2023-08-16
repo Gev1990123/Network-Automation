@@ -32,7 +32,7 @@ def main_menu():
     print("7. Backup Running Configuration")
     print("8. Reload Device Now")
     print("9. Planned Reload")
-    print("10. Firmware Upgrade *To be completed*")
+    #print("10. Firmware Upgrade *To be completed*")
     print("11. Get Device Inventory")
     print("15. Exit")
 
@@ -409,7 +409,7 @@ while True:
     elif menu_selection == '9':
         planned_reload()
     elif menu_selection == '10':
-        firmware_upgrade()
+    # firmware_upgrade()
     elif menu_selection == '11':
         get_device_inventory()
     elif menu_selection == '15':
