@@ -1,13 +1,11 @@
-import netmiko
-from netmiko import ConnectHandler, SCPConn, file_transfer, progress_bar
+from netmiko import ConnectHandler, file_transfer, progress_bar
 from datetime import datetime
 import os
-import hashlib
 import time
 from easygui import passwordbox
 import re
-
-
+from tabulate import tabulate
+import textfsm
 
 
 def check_ping(hostname):
@@ -34,8 +32,24 @@ def main_menu():
     print("7. Backup Running Configuration")
     print("8. Reload Device Now")
     print("9. Planned Reload")
-    print("10. Firmware Upgrade")
-    print("11. Exit")
+    print("10. Firmware Upgrade *To be completed*")
+    print("11. Get Device Inventory")
+    print("15. Exit")
+
+
+def get_device_inventory():
+    time.sleep(2)
+    device_inventory = net_connect.send_command("show inventory")
+    print(f'Gathering the devices inventory')
+    time.sleep(3)
+    template = open(r'template/show_inventory.textfsm')
+    re_table = textfsm.TextFSM(template)
+    results = re_table.ParseText(device_inventory)
+    header = re_table.header
+    print(f'Collating and formatting the information')
+    time.sleep(2)
+    print(tabulate(results, headers=header))
+    time.sleep(3)
 
 
 def backup_configuration():
@@ -214,7 +228,11 @@ def show_int_status():
     print(f'Collating current interface status\n')
     time.sleep(4)
     show_int_status = net_connect.send_command('show int status')
-    print(show_int_status)
+    template = open(r'template/show_interface_status.textfsm')
+    re_table = textfsm.TextFSM(template)
+    results = re_table.ParseText(show_int_status)
+    header = re_table.header
+    print(tabulate(results, headers=header))
     time.sleep(3)
 
 
@@ -393,6 +411,8 @@ while True:
     elif menu_selection == '10':
         firmware_upgrade()
     elif menu_selection == '11':
+        get_device_inventory()
+    elif menu_selection == '15':
         exit_program()
         break
     else:
