@@ -30,11 +30,34 @@ def main_menu():
     print("5. Bounce Selected Interface")
     print("6. Shut Interface")
     print("7. Backup Running Configuration")
-    print("8. Reload Device Now")
-    print("9. Planned Reload")
+    print("8. Reload Menu")
+    print("9. Get Device Inventory")
     #print("10. Firmware Upgrade *To be completed*")
-    print("11. Get Device Inventory")
+    #print("11. Get Device Inventory")
     print("15. Exit")
+
+
+def reload_menu():
+    while True:
+
+        print("")  # print blank lines
+        print("")  # print blank lines
+        print("Reload Menu")
+        print("1. Reload Now")
+        print("2. Planned Reload")
+        print("3. Cancel Reload")
+        print("4. Return to Main Menu")
+
+        reload_menu_selection = input(f'Please enter your selection: ')
+
+        if reload_menu_selection == '1':
+            reload_now()
+        elif reload_menu_selection == '2':
+            planned_reload()
+        elif reload_menu_selection == '3':
+            cancel_reload()
+        elif reload_menu_selection == '4':
+            return
 
 
 def get_device_inventory():
@@ -248,6 +271,40 @@ def planned_reload():
     print(re_match[0])
     time.sleep(3)
 
+
+def cancel_reload():
+    time.sleep(2)
+    print("")  # print blank line
+    print(f'Identifying if there is a pending reload')
+
+    reload_scheduled = net_connect.send_command('show reload')
+    if 'Reload scheduled in' in reload_scheduled:
+        regx = re.compile(r'^Reload\sscheduled.*')
+        re_match = regx.findall(reload_scheduled)
+        print("")  # print blank line
+        print(re_match[0])  # prints the current reload schedule
+        print("")  # print blank line
+        time.sleep(1)
+        confirm_cancel = input(f'Are you sure you would like to cancel this reload? (Y/N): ')
+        print("")  # print blank line
+        if confirm_cancel == 'YES' or confirm_cancel == 'Y':
+            print(f'Canceling the scheduled reload')
+            print("")  # print blank line
+            net_connect.send_command('reload cancel')
+            #cancel_reload = net_connect.send_command('show reload')
+            #print(cancel_reload)
+        else:
+            print(f'The scheduled reload will not be cancelled')
+            print("")  # print blank line
+            time.sleep(2)
+            return
+
+    else:
+        print("")  # print blank line
+        print(f'No reload scheduled, so nothing to cancel')
+        return
+
+
 def show_vlan():
     time.sleep(2)
     print(f'Collating all VLANs currently on device\n')
@@ -441,14 +498,14 @@ while True:
     elif menu_selection == '7':
         backup_configuration()
     elif menu_selection == '8':
-        reload_now()
+        reload_menu()
     elif menu_selection == '9':
-        planned_reload()
+        get_device_inventory()
     elif menu_selection == '10':
         print(f'Currently under progress')
     # firmware_upgrade()
     elif menu_selection == '11':
-        get_device_inventory()
+        print(f'Unused')
     elif menu_selection == '15':
         exit_program()
         break
