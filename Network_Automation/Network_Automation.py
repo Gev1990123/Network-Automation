@@ -201,16 +201,52 @@ def reload_now():
 
 def planned_reload():
     time.sleep(2)
-    # confirm_reload = input(f'Are you sure you want to reload {hostname}')
-    # if confirm_reload == 'YES' or confirm_reload == 'Y':
-    #     time.sleep(2)
-    #     print(f'{hostname} is going to be reloaded, this will impact any downstream devices')
-    #     net_connect.send_command('reload', expect_string='')
-    #     net_connect.send_command('\n')
-    # else:
-    #     print(f'{hostname} will not be reloaded at this stage')
+    reload_in = input(f'Please input when the device should be reloaded (hh:mm):  ')
+    print("")  # print blank line
+    hours_and_seconds = reload_in.split(':')
+    time.sleep(1)
+    print(f'Identifying if there is a pending reload scheduled')
+    print("")  # print blank line
+    time.sleep(2)
+    reload_scheduled = net_connect.send_command('show reload')
+    if 'Reload scheduled in' in reload_scheduled:
+        regx = re.compile(r'^Reload\sscheduled.*')
+        re_match = regx.findall(reload_scheduled)
+        print(re_match[0]) # prints the current reload schedule
+        print("")  # print blank line
+        time.sleep(1)
+        print(f'Scheduling this reload, will remove the previously scheduled reload')
+        print("")  # print blank line
+        time.sleep(1)
+        confirm_reload = input(f'Do you want to continue to schedule this reload (Y/N): ')
+        print("")  # print blank line
+        if confirm_reload == 'YES' or confirm_reload == 'Y':
+            print(f'Continuing to schedule this reload')
+            print("")  # print blank line
+            time.sleep(1)
+        else:
+            print(f'Will not schedule this reload')
+            print("")  # print blank line
+            time.sleep(2)
+            return
+    else:
+        print(f'No reload scheduled, scheduling the reload in {hours_and_seconds[0]} hours and {hours_and_seconds[1]} minutes.')
+        print("")  # print blank line
 
+    time.sleep(2)
+    print(f'Saving Current Configuration')
+    print("") #print blank line
+    net_connect.send_command('write memory')
+    time.sleep(3)
+    net_connect.send_command(f'reload in {reload_in}', expect_string='')
+    net_connect.send_command('\n')
 
+    reload_scheduled = net_connect.send_command('show reload')
+
+    regx = re.compile(r'^Reload\sscheduled.*')
+    re_match = regx.findall(reload_scheduled)
+    print(re_match[0])
+    time.sleep(3)
 
 def show_vlan():
     time.sleep(2)
@@ -387,7 +423,7 @@ while True:
 
 while True:
     main_menu() # displays main menu
-    menu_selection = input(f'Please enter your selection [1-4]: ')
+    menu_selection = input(f'Please enter your selection: ') # removed [1-4]
     print("")  # print blank lines
     # if to access menu selection
     if menu_selection == '1':
@@ -409,6 +445,7 @@ while True:
     elif menu_selection == '9':
         planned_reload()
     elif menu_selection == '10':
+        print(f'Currently under progress')
     # firmware_upgrade()
     elif menu_selection == '11':
         get_device_inventory()
