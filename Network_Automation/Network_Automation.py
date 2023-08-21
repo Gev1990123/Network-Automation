@@ -23,18 +23,64 @@ def check_ping(hostname):
 def main_menu():
     print("")  # print blank lines
     print("")  # print blank lines
-    print("1. Show VLAN list")
-    print("2. Show interface status")
-    print("3. Modify interface")
-    print("4. Modify Interface Description")
-    print("5. Bounce Selected Interface")
-    print("6. Shut Interface")
-    print("7. Backup Running Configuration")
-    print("8. Reload Menu")
-    print("9. Get Device Inventory")
+    print("1. Show Menu")
+    print("2. Configuration Menu")
+    print("3. Reload Menu")
     #print("10. Firmware Upgrade *To be completed*")
     #print("11. Get Device Inventory")
-    print("15. Exit")
+    print("4. Exit")
+
+def config_menu():
+    while True:
+        print("")  # print blank lines
+        print("")  # print blank lines
+        print("Configuration Menu")
+        print("1. Modify interface")
+        print("2. Modify Interface Description")
+        print("3. Bounce Selected Interface")
+        print("4. Shut Interface")
+        print("5. Backup Running Configuration")
+        print("6. Return to Main Menu")
+
+        config_menu_selection = input(f'Please enter your selection: ')
+
+        if config_menu_selection == '1':
+            modify_interface()
+        elif config_menu_selection == '2':
+            modify_interface_description()
+        elif config_menu_selection == '3':
+            bounce_interface()
+        elif config_menu_selection == '4':
+            shut_interface()
+        elif config_menu_selection == '5':
+            backup_configuration()
+        elif config_menu_selection == '6':
+            return
+
+
+def show_menu():
+    while True:
+        print("")  # print blank lines
+        print("")  # print blank lines
+        print("Show Menu")
+        print("1. Show VLAN list")
+        print("2. Show Interface status")
+        print("3. Show Running Configuration")
+        print("4. Get Device Inventory")
+        print("5. Return to Main Menu")
+
+        show_menu_selection = input(f'Please enter your selection: ')
+
+        if show_menu_selection == '1':
+            show_vlan()
+        elif show_menu_selection == '2':
+            show_int_status()
+        elif show_menu_selection == '3':
+            show_run()
+        elif show_menu_selection == '4':
+            get_device_inventory()
+        elif show_menu_selection == '5':
+            return
 
 
 def reload_menu():
@@ -59,6 +105,16 @@ def reload_menu():
         elif reload_menu_selection == '4':
             return
 
+
+def show_run():
+    print("")  # print blank lines
+    time.sleep(2)
+    interface = input(f'Please enter the interface e.g. Gi1/0/1: ')
+    print(f'Collating the running configuration of {interface}')
+    time.sleep(3)
+    show_run_config = net_connect.send_command(f'show running-config interface {interface}')
+    print(show_run_config)
+    time.sleep(3)
 
 def get_device_inventory():
     time.sleep(2)
@@ -319,6 +375,7 @@ def cancel_reload():
 
 
 def show_vlan():
+    print("")  # print blank lines
     time.sleep(2)
     print(f'Collating all VLANs currently on device\n')
     time.sleep(4)
@@ -330,6 +387,7 @@ def show_vlan():
 
 
 def show_int_status():
+    print("")  # print blank lines
     time.sleep(2)
     print(f'Collating current interface status\n')
     time.sleep(4)
@@ -497,29 +555,12 @@ while True:
     print("")  # print blank lines
     # if to access menu selection
     if menu_selection == '1':
-        show_vlan()
+        show_menu()
     elif menu_selection == '2':
-        show_int_status()
+        config_menu()
     elif menu_selection == '3':
-        modify_interface()
-    elif menu_selection == '4':
-        modify_interface_description()
-    elif menu_selection == '5':
-        bounce_interface()
-    elif menu_selection == '6':
-        shut_interface()
-    elif menu_selection == '7':
-        backup_configuration()
-    elif menu_selection == '8':
         reload_menu()
-    elif menu_selection == '9':
-        get_device_inventory()
-    elif menu_selection == '10':
-        print(f'Currently under progress')
-    # firmware_upgrade()
-    elif menu_selection == '11':
-        print(f'Unused')
-    elif menu_selection == '15':
+    elif menu_selection == '4':
         exit_program()
         break
     else:
