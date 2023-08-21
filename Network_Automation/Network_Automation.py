@@ -192,16 +192,29 @@ def firmware_upgrade():
     dest_file = firmware_image
     transfer_dict = file_transfer(net_connect, source_file=source_file, dest_file=dest_file, direction='put', overwrite_file=False, progress=progress_bar, socket_timeout=240,)
 
+    #get image file size
+    filesize = os.path.getsize(source_file)
+
     #check file size is increasing
-    time.sleep(10)
-    filesize = net_connect.send_command(f'dir flash: | in {firmware_image}')
-    print(filesize)
+    for m in filesize:
+        time.sleep(10)
+        filesize = net_connect.send_command(f'dir flash: | in {firmware_image}')
+        print(filesize)
 
 
     if transfer_dict.get("file_exists") is True and transfer_dict.get("file_transferred") is False and transfer_dict.get("file_verified") is True:
-        print(f'Firmware is already on the device, and has not been copied but has verified that the MD5 checksum are correct')
+        print(f'Firmware is already on the device, and has not been copied.')
+        print(f'MD5 Check... Success! - Starting installing, activating and commiting new Image. Reload will follow!')
     else:
-        print(f'Firmware has been copied to the device and MD5 checksum verified.')
+        print(f'Firmware copied, MD5 Check... Success! - Starting installing, activating and commiting new Image. Reload will follow!')
+
+    try:
+        net_connect.send_command(f'install add file flash:{firmware_image} activate commit prompt-level none')
+    except:
+        print("Reloading! Please check if device comes up again")
+    else:
+        print("\n\n Abort !!!\n\n")
+
 
 
     #install firmware version
