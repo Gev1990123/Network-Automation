@@ -1,0 +1,10 @@
+Value INTERFACE ([i].+)
+Value DESC (\s[d].+)
+Value VLAN (\s[s].+\s[a].+\s[v].+)
+Value MODE (^\s[s].+\s[m].+)
+
+Start
+   ^{INTERFACE} -> Record
+   ^{DESC} -> Record
+   ^{VLAN} -> Record
+   ^{MODE} -> Record

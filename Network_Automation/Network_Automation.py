@@ -106,6 +106,16 @@ def reload_menu():
             return
 
 
+def show_run():
+    print("")  # print blank lines
+    time.sleep(2)
+    interface = input(f'Please enter the interface e.g. Gi1/0/1: ')
+    print(f'Collating the running configuration of {interface}')
+    time.sleep(3)
+    show_run_config = net_connect.send_command(f'show running-config interface {interface}')
+    print(show_run_config)
+    time.sleep(3)
+
 def get_device_inventory():
     time.sleep(2)
     device_inventory = net_connect.send_command("show inventory")
